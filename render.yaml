@@ -1,0 +1,18 @@
+version: 1
+services:
+  - type: web
+    name: LibraryManagementSystem
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
+    plan: free
+    envVars:
+      DB_HOST: "localhost"
+      DB_USER: "root"
+      DB_PASSWORD: "Kattu10.@"
+      DB_NAME: "LibrarySystem"
+      DB_PORT: "3300"
+      JWT_SECRET: "3g5Bv9zsWlKd0sQ8R1f2Hy3Nq6T7eYbV4p6Ua8Rc2l0Mm3wX7tZa9"
+      BASE_URL: "http://localhost:3000"
+      PORT: "3000"
