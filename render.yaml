@@ -8,11 +8,19 @@ services:
     autoDeploy: true
     plan: free
     envVars:
-      DB_HOST: "localhost"
-      DB_USER: "root"
-      DB_PASSWORD: "Kattu10.@"
-      DB_NAME: "LibrarySystem"
-      DB_PORT: "3300"
-      JWT_SECRET: "3g5Bv9zsWlKd0sQ8R1f2Hy3Nq6T7eYbV4p6Ua8Rc2l0Mm3wX7tZa9"
-      BASE_URL: "http://localhost:3000"
-      PORT: "3000"
+      - key: DB_HOST
+        value: "localhost"
+      - key: DB_USER
+        value: "root"
+      - key: DB_PASSWORD
+        value: "Kattu10.@"
+      - key: DB_NAME
+        value: "LibrarySystem"
+      - key: DB_PORT
+        value: "3300"
+      - key: JWT_SECRET
+        value: "3g5Bv9zsWlKd0sQ8R1f2Hy3Nq6T7eYbV4p6Ua8Rc2l0Mm3wX7tZa9"
+      - key: BASE_URL
+        value: "http://localhost:3000"
+      - key: PORT
+        value: "3000"
