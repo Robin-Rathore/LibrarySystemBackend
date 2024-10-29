@@ -4,7 +4,7 @@ services:
     name: LibraryManagementSystem
     env: node
     buildCommand: npm install
-    startCommand: node server.js
+    startCommand: node Server.js  # Ensure the correct filename
     autoDeploy: true
     plan: free
     envVars:
