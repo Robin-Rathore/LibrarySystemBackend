@@ -8,7 +8,7 @@ import { AddBooks, DeleteBook, GetBooks, SearchBook } from "./routes/books.js";
 dotenv.config();
 const app = express();
 
-// CORS configuration
+// CORS configuration 
 app.use(cors({
     origin: ['http://localhost:5174', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
