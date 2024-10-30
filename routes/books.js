@@ -32,7 +32,7 @@ export const DeleteBook = async (req, res) => {
 
         const bookId = result[0].book_id;
 
-        const deleteQuery = 'DELETE FROM fines WHERE borrow_id IN (SELECT borrow_id FROM borrowinghistory WHERE book_id = ?)';
+        const deleteQuery = 'DELETE FROM fines WHERE borrow_id IN (SELECT borrow_id FROM BorrowingHistory WHERE book_id = ?)';
         await queryDatabase(deleteQuery, [bookId]);
 
         const deleteBookQuery = 'DELETE FROM books WHERE book_id = ?';

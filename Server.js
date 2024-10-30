@@ -2,13 +2,11 @@ import express from "express";
 import cors from "cors";
 import dotenv from 'dotenv';
 import { loginUser, registerUser } from "./controllers/authController.js";
-import { AddBooks, DeleteBook, GetBooks, SearchBook } from "./routes/books.js";
+import { AddBooks,  DeleteBook, GetBooks, SearchBook } from "./routes/books.js";
 
-// Load environment variables
 dotenv.config();
 const app = express();
-
-// CORS configuration 
+app.use(cors());
 app.use(cors({
     origin: ['http://localhost:5174', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -38,8 +36,6 @@ app.use((req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
-app.listen(PORT, () => {
-    console.log(`Server is running on ${BASE_URL}`);
+app.listen(process.env.PORT || 5000, () => {
+    console.log(`Server is running on http://localhost:${process.env.PORT || 5000}`);
 });
