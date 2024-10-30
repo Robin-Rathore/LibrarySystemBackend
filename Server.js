@@ -25,10 +25,14 @@ app.get('/getbooks', GetBooks);
 app.get('/searchbooks', SearchBook);
 
 // Error handling for server errors
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ message: 'Internal Server Error' });
+app.get('/test', (req, res) => {
+    res.json({ message: 'Backend is running!' });
 });
+app.use((err, req, res, next) => {
+    console.error('Error occurred:', err);
+    res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
+});
+
 
 // Handle 404 errors for unknown routes
 app.use((req, res) => {
