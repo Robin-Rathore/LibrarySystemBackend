@@ -4,15 +4,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
+    host: process.env.DB_HOST || 'mysql.railway.internal',  // Change to internal host
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'CzHObDvaiWXMPALzxRqjQYvdrOnzGGTK',
+    database: process.env.DB_NAME || 'railway',
+    port: process.env.DB_PORT || 3306, // Change to the internal port
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
+
 
 // Function to connect and execute a query
 export async function queryDatabase(query, params) {
