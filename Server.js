@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from 'dotenv';
-import { loginUser, registerUser } from "./controllers/authController.js";
+import { checkEmail, loginUser, registerUser, requestOTP, resendOTP, verifyOTP } from "./controllers/authController.js";
 import { AddBooks,  DeleteBook, GetBooks, SearchBook } from "./routes/books.js";
 
 dotenv.config();
@@ -23,16 +23,16 @@ app.delete('/books/:book_id', DeleteBook);
 app.post('/login', loginUser);
 app.get('/getbooks', GetBooks);
 app.get('/searchbooks', SearchBook);
+app.post('/request-otp', requestOTP);
+app.post('/verify-otp', verifyOTP);
+app.post('/check-email', checkEmail);
+app.post('/resend-otp', resendOTP);
 
 // Error handling for server errors
-app.get('/test', (req, res) => {
-    res.json({ message: 'Backend is running!' });
-});
 app.use((err, req, res, next) => {
-    console.error('Error occurred:', err);
-    res.status(err.status || 500).json({ message: err.message || 'Internal Server Error' });
+    console.error(err.stack);
+    res.status(500).json({ message: 'Internal Server Error' });
 });
-
 
 // Handle 404 errors for unknown routes
 app.use((req, res) => {

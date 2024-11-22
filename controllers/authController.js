@@ -106,7 +106,7 @@ export const checkBookOwner = async (req, res, next) => {
 
 
 // Helper function to generate a random OTP
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000);
+const generateOTP = () => Math.floor(1000 + Math.random() * 9000);
 
 export const requestOTP = async (req, res) => {
     const { email } = req.body;
