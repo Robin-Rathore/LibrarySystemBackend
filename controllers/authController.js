@@ -140,9 +140,22 @@ export const requestOTP = async (req, res) => {
         const mailOptions = {
             from: process.env.EMAIL_USERNAME,
             to: email,
-            subject: "Your OTP Code",
-            text: `Your OTP code is ${otp}. It is valid for 5 minutes.`,
-        };
+            subject: "Your One-Time Password (OTP) Code",
+            html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <h2 style="color: #4CAF50;">Your OTP Code</h2>
+                    <p>Hello,</p>
+                    <p>Thank you for using our service! Here is your OTP code:</p>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #4CAF50; text-align: center; margin: 10px 0;">
+                        ${otp}
+                    </div>
+                    <p>This code is valid for <strong>5 minutes</strong>. Please use it to complete your verification.</p>
+                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                    <p style="font-size: 0.9em;">If you did not request this code, please ignore this email or contact our support team for assistance.</p>
+                    <p style="font-size: 0.9em;">Best regards,<br>Your Service Team</p>
+                </div>
+            `,
+        };        
 
         await transporter.sendMail(mailOptions);
 
