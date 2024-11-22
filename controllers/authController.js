@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { queryDatabase } from "../db.js";
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer'
 import jwt from "jsonwebtoken";
 dotenv.config();
 
@@ -99,5 +100,179 @@ export const checkBookOwner = async (req, res, next) => {
     } catch (error) {
         console.error("Error checking book ownership:", error);
         res.status(500).json({ error: "Error checking book ownership" });
+    }
+};
+
+
+
+// Helper function to generate a random OTP
+const generateOTP = () => Math.floor(100000 + Math.random() * 900000);
+
+export const requestOTP = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+    }
+
+    try {
+        // Generate a 6-digit OTP
+        const otp = generateOTP();
+
+        // Store OTP in the database with expiration time (e.g., 5 minutes)
+        const expirationTime = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+        const sql = `
+            INSERT INTO otp_requests (email, otp, expires_at) 
+            VALUES (?, ?, ?) 
+            ON DUPLICATE KEY UPDATE otp = VALUES(otp), expires_at = VALUES(expires_at)
+        `;
+        await queryDatabase(sql, [email, otp, expirationTime]);
+
+        // Send OTP via email using nodemailer
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USERNAME,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USERNAME,
+            to: email,
+            subject: "Your OTP Code",
+            text: `Your OTP code is ${otp}. It is valid for 5 minutes.`,
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: "OTP sent successfully" });
+    } catch (error) {
+        console.error("Error sending OTP:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+
+
+// Verify OTP
+export const verifyOTP = async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return res.status(400).json({ message: "Email and OTP are required" });
+    }
+
+    try {
+        // Check if the OTP exists and is valid
+        const sql = ' SELECT * FROM otp_requests WHERE email = ? AND otp = ? AND expires_at > NOW() ';
+        const result = await queryDatabase(sql, [email, otp]);
+
+        if (result.length === 0) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        // OTP is valid, mark the email as verified
+        const updateSql = ' UPDATE users SET is_verified = 1 WHERE email = ?';
+        await queryDatabase(updateSql, [email]);
+
+        // Optionally delete the OTP record after successful verification
+        const deleteSql = 'DELETE FROM otp_requests WHERE email = ?';
+        await queryDatabase(deleteSql, [email]);
+
+        res.status(200).json({ message: "OTP verified successfully" });
+    } catch (error) {
+        console.error("Error verifying OTP:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+
+//Check Email
+export const checkEmail = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+    }
+
+    try {
+        const sql = 'SELECT email, is_verified FROM users WHERE email = ?';
+        const result = await queryDatabase(sql, [email]);
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Email not registered" });
+        }
+
+        const { is_verified } = result[0];
+
+        res.status(200).json({
+            message: "Email found",
+            isVerified: Boolean(is_verified),
+        });
+    } catch (error) {
+        console.error("Error checking email:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+
+//Resend OTP
+
+export const resendOTP = async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+    }
+
+    try {
+        // Check if the user exists
+        const userCheckSql ='SELECT email FROM users WHERE email = ?';
+        const userResult = await queryDatabase(userCheckSql, [email]);
+
+        if (userResult.length === 0) {
+            return res.status(404).json({ message: "Email not registered" });
+        }
+
+        // Check for an existing valid OTP
+        const otpCheckSql = 'SELECT otp, expires_at FROM otp_requests WHERE email = ? AND expires_at > NOW()';
+        const otpResult = await queryDatabase(otpCheckSql, [email]);
+
+        let otp;
+        if (otpResult.length > 0) {
+            // Use the existing valid OTP
+            otp = otpResult[0].otp;
+        } else {
+            // Generate a new OTP
+            otp = Math.floor(100000 + Math.random() * 900000);
+            const expirationTime = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+            const insertSql = 'INSERT INTO otp_requests (email, otp, expires_at) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE otp = ?, expires_at = ?';
+            await queryDatabase(insertSql, [email, otp, expirationTime, otp, expirationTime]);
+        }
+
+        // Send OTP via email
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USERNAME,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USERNAME,
+            to: email,
+            subject: "Your OTP Code (Resent)",
+            text: 'Your OTP code is ${otp}. It is valid for 5 minutes.',
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: "OTP resent successfully" });
+    } catch (error) {
+        console.error("Error resending OTP:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
