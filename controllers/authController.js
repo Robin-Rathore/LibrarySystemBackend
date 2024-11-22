@@ -159,7 +159,7 @@ export const requestOTP = async (req, res) => {
 
         await transporter.sendMail(mailOptions);
 
-        res.status(200).json({ message: "OTP sent successfully" });
+        res.status(200).json({ message: "OTP sent successfully", otpId: otp});
     } catch (error) {
         console.error("Error sending OTP:", error);
         res.status(500).json({ message: "Server error", error: error.message });
