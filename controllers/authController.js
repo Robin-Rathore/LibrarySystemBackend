@@ -121,12 +121,11 @@ export const requestOTP = async (req, res) => {
 
         // Store OTP in the database with expiration time (e.g., 5 minutes)
         const expirationTime = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
-        const sql = `
-            INSERT INTO otp_requests (email, otp, expires_at) 
-            VALUES (?, ?, ?) 
-            ON DUPLICATE KEY UPDATE otp = VALUES(otp), expires_at = VALUES(expires_at)
-        `;
-        await queryDatabase(sql, [email, otp, expirationTime]);
+        const expirationTimeString = expirationTime.toISOString().slice(0, 19).replace('T', ' '); // Format as 'YYYY-MM-DD HH:MM:SS'
+
+        const sql = 'INSERT INTO otp_requests (email, otp, expires_at) VALUES (?, ?, ?)';
+        await queryDatabase(sql, [email, otp, expirationTimeString]);
+
 
         // Send OTP via email using nodemailer
         const transporter = nodemailer.createTransport({
@@ -193,7 +192,7 @@ export const verifyOTP = async (req, res) => {
         const deleteSql = 'DELETE FROM otp_requests WHERE email = ?';
         await queryDatabase(deleteSql, [email]);
 
-        res.status(200).json({ message: "OTP verified successfully" });
+        res.status(200).json({success: true, message: "OTP verified successfully" });
     } catch (error) {
         console.error("Error verifying OTP:", error);
         res.status(500).json({ message: "Server error", error: error.message });
@@ -289,3 +288,8 @@ export const resendOTP = async (req, res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
+// const sql = `
+//             INSERT INTO otp_requests (email, otp, expires_at) 
+//             VALUES (?, ?, ?) 
+            // ON DUPLICATE KEY UPDATE otp = VALUES(otp), expires_at = VALUES(expires_at)
