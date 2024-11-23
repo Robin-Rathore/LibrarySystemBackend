@@ -139,22 +139,38 @@ export const requestOTP = async (req, res) => {
         const mailOptions = {
             from: process.env.EMAIL_USERNAME,
             to: email,
-            subject: "Your One-Time Password (OTP) Code",
+            subject: "🔒 YourLibrary: Verify Your Account with OTP",
             html: `
-                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                    <h2 style="color: #4CAF50;">Your OTP Code</h2>
-                    <p>Hello,</p>
-                    <p>Thank you for using our service! Here is your OTP code:</p>
-                    <div style="font-size: 1.5em; font-weight: bold; color: #4CAF50; text-align: center; margin: 10px 0;">
-                        ${otp}
+                <div style="font-family: 'Arial', sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <div style="background: #4CAF50; color: white; padding: 20px; text-align: center;">
+                        <h1 style="margin: 0;">Welcome to YourLibrary</h1>
+                        <p style="margin: 0; font-size: 1.1em;">Your gateway to infinite knowledge</p>
                     </div>
-                    <p>This code is valid for <strong>5 minutes</strong>. Please use it to complete your verification.</p>
-                    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                    <p style="font-size: 0.9em;">If you did not request this code, please ignore this email or contact our support team for assistance.</p>
-                    <p style="font-size: 0.9em;">Best regards,<br>Your Service Team</p>
+                    <div style="padding: 20px;">
+                        <h2 style="color: #4CAF50; text-align: center;">Your OTP Code</h2>
+                        <p>Hi there,</p>
+                        <p>Thank you for signing up with <strong>YourLibrary</strong>. To verify your account, please use the One-Time Password (OTP) below:</p>
+                        <div style="font-size: 2em; font-weight: bold; color: #4CAF50; text-align: center; margin: 20px 0;">
+                            ${otp}
+                        </div>
+                        <p style="text-align: center; font-size: 0.9em; color: #555;">This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                        <p>If you did not request this OTP, please disregard this email or <a href="mailto:support@yourlibrary.com" style="color: #4CAF50; text-decoration: none;">contact our support team</a>.</p>
+                    </div>
+                    <div style="background: #f9f9f9; padding: 20px; text-align: center; font-size: 0.9em; color: #555;">
+                        <p>Regards,</p>
+                        <p>The <strong>YourLibrary</strong> Team</p>
+                        <p style="margin-top: 10px;">
+                            <strong>Robin Rathore</strong><br>
+                            <a href="https://www.linkedin.com/in/robin-rathore-833863238?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BpSnYjaHgTsCIp5pYWi4TOA%3D%3D" target="_blank" style="color: #4CAF50; text-decoration: none;">Connect with me on LinkedIn</a>
+                        </p>
+                        <p style="margin-top: 20px; font-size: 0.8em; color: #aaa;">
+                            &copy; ${new Date().getFullYear()} YourLibrary, All rights reserved.
+                        </p>
+                    </div>
                 </div>
             `,
-        };        
+        };               
 
         await transporter.sendMail(mailOptions);
 
